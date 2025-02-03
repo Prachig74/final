@@ -1,4 +1,6 @@
-# Use Maven and OpenJDK image
+
+
+# Use Maven image for building the project
 FROM maven:3.8.6-openjdk-21-slim AS build
 
 WORKDIR /app
@@ -7,7 +9,7 @@ COPY . /app
 # Build the project
 RUN mvn clean package -DskipTests
 
-# Final image to run the app
+# Use OpenJDK image for running the application
 FROM openjdk:21-slim
 
 WORKDIR /app
