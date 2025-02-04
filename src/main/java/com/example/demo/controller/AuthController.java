@@ -29,28 +29,54 @@ public class AuthController {
     public AuthController() {
     }
 
-    @PostMapping({"/signup"})
+//    @PostMapping({"/signup"})
+//    public ResponseEntity<String> signup(@RequestBody Users user) {
+//        Optional<Users> existingUser = this.userService.findByUsername(user.getUsername());
+//        if (existingUser.isPresent()) {
+//            return ResponseEntity.status(HttpStatus.CONFLICT).body("Username already exists!");
+//        } else {
+//            String encodedPassword = this.passwordEncoder.encode(user.getPassword());
+//            user.setPassword(encodedPassword);
+//            this.userService.saveUser(user);
+//            return ResponseEntity.status(HttpStatus.CREATED).body("User registered successfully!");
+//        }
+//    }
+
+//    @PostMapping({"/login"})
+//    public ResponseEntity<String> login(@RequestBody Users user) {
+//        Optional<Users> existingUser = this.userService.findByUsername(user.getUsername());
+//        if (existingUser.isPresent() && this.passwordEncoder.matches(user.getPassword(), ((Users)existingUser.get()).getPassword())) {
+//            String token = this.jwtUtil.generateToken(user.getUsername());
+//            return ResponseEntity.ok(token);
+//        } else {
+//            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials!");
+//        }
+//    }
+
+
+
+    @PostMapping("/signup")
     public ResponseEntity<String> signup(@RequestBody Users user) {
-        Optional<Users> existingUser = this.userService.findByUsername(user.getUsername());
-        if (existingUser.isPresent()) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body("Username already exists!");
-        } else {
-            String encodedPassword = this.passwordEncoder.encode(user.getPassword());
-            user.setPassword(encodedPassword);
-            this.userService.saveUser(user);
-            return ResponseEntity.status(HttpStatus.CREATED).body("User registered successfully!");
+        if (userService.findByEmail(user.getEmail()).isPresent()) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("Email already exists!");
         }
+        if (userService.findByUsername(user.getUsername()).isPresent()) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("Username already taken!");
+        }
+
+        user.setPassword(passwordEncoder.encode(user.getPassword())); // Encrypt password
+        userService.saveUser(user);
+        return ResponseEntity.status(HttpStatus.CREATED).body("User registered successfully!");
     }
 
-    @PostMapping({"/login"})
+    @PostMapping("/login")
     public ResponseEntity<String> login(@RequestBody Users user) {
-        Optional<Users> existingUser = this.userService.findByUsername(user.getUsername());
-        if (existingUser.isPresent() && this.passwordEncoder.matches(user.getPassword(), ((Users)existingUser.get()).getPassword())) {
-            String token = this.jwtUtil.generateToken(user.getUsername());
+        Optional<Users> existingUser = userService.findByEmail(user.getEmail()); // Login using email
+        if (existingUser.isPresent() && passwordEncoder.matches(user.getPassword(), existingUser.get().getPassword())) {
+            String token = jwtUtil.generateToken(existingUser.get().getEmail()); // Generate token using email
             return ResponseEntity.ok(token);
-        } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials!");
         }
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials!");
     }
 
     @GetMapping({"/validate-token"})

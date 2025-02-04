@@ -5,14 +5,11 @@
 
 package com.example.demo.model;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.ElementCollection;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.persistence.*;
+
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -42,23 +39,17 @@ public class Property {
     )
     private double price;
     private LocalDate availableDate;
-//    @ElementCollection
-//    private List<Integer> bhks;
 
     @Column
     private Integer bhks;
 
+
+    @Column
+    private String amenities; // Storing as JSON String
     public Property() {
     }
 
-//    public List<Integer> getBhks() {
-//        return this.bhks;
-//    }
-//
-//    public void setBhks(List<Integer> bhks) {
-//        this.bhks = bhks;
-//    }
-// Getter and setter methods
+
 public Integer getBhks() {
     return this.bhks;
 }
@@ -113,5 +104,26 @@ public Integer getBhks() {
 
     public void setPrice(double price) {
         this.price = price;
+    }
+
+
+    // Getter for amenities as List<String>
+    public List<String> getAmenitiesList() {
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            return objectMapper.readValue(this.amenities, List.class);
+        } catch (Exception e) {
+            return new ArrayList<>();
+        }
+    }
+
+    // Setter for amenities as List<String>
+    public void setAmenitiesList(List<String> amenities) {
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            this.amenities = objectMapper.writeValueAsString(amenities);
+        } catch (Exception e) {
+            this.amenities = "[]"; // Default empty JSON array
+        }
     }
 }

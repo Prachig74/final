@@ -19,15 +19,27 @@ public class UserService {
     public UserService() {
     }
 
-    public Users registerUser(String username, String password) {
+//    public Users registerUser(String username, String password) {
+//        Users user = new Users();
+//        user.setUsername(username);
+//        user.setPassword(this.passwordEncoder.encode(password));
+//        return (Users)this.userRepository.save(user);
+//    }
+
+    public Users registerUser(String username, String email, String password) {
         Users user = new Users();
         user.setUsername(username);
+        user.setEmail(email); // Set email field
         user.setPassword(this.passwordEncoder.encode(password));
-        return (Users)this.userRepository.save(user);
+        return userRepository.save(user);
     }
 
-    public Optional<Users> findByUsername(String username) {
+        public Optional<Users> findByUsername(String username) {
         return this.userRepository.findByUsername(username);
+    }
+
+    public Optional<Users> findByEmail(String email) {
+        return userRepository.findByEmail(email); // Added method to find user by email
     }
 
     public void saveUser(Users user) {

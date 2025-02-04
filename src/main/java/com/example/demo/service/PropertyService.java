@@ -44,6 +44,8 @@ public class PropertyService {
             property.setPrice(propertyDetails.getPrice());
             property.setBhks(propertyDetails.getBhks());
             property.setAvailableDate(propertyDetails.getAvailableDate());
+//            property.setAmenities(propertyDetails.getAmenities());
+            property.setAmenitiesList(propertyDetails.getAmenitiesList());
             return (Property)this.propertyRepository.save(property);
         } else {
             return null;
